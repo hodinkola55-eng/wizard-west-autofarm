@@ -68,14 +68,26 @@ function Farm.pressKey(k)
     end
 end
 
--- ИСПРАВЛЕННЫЙ NOCLIP
+-- АГРЕССИВНЫЙ NOCLIP + АНТИ-ЗАВИСАНИЕ
 RunSvc.Stepped:Connect(function()
-    if not Farm.Cfg.Enabled or not Farm.Cfg.NoClip then return end
+    if not Farm.Cfg.Enabled then return end
     local char = LP.Character
     if char then
-        for _, part in ipairs(char:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.CanCollide = false
+        -- NoClip для персонажа
+        if Farm.Cfg.NoClip then
+            for _, part in ipairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+        end
+        -- Анти-зависание при контакте с целью
+        if Farm.St.Target and Farm.St.Target.Parent then
+            local targetChar = Farm.St.Target.Parent
+            for _, p in ipairs(targetChar:GetDescendants()) do
+                if p:IsA("BasePart") then
+                    p.CanCollide = false
+                end
             end
         end
     end
