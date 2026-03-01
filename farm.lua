@@ -68,27 +68,31 @@ function Farm.pressKey(k)
     end
 end
 
--- АГРЕССИВНЫЙ NOCLIP + АНТИ-ЗАВИСАНИЕ
-RunSvc.Stepped:Connect(function()
-    if not Farm.Cfg.Enabled then return end
+-- ОПТИМИЗИРОВАННЫЙ NOCLIP (ТОЛЬКО ПО ТРЕБОВАНИЮ)
+local function setNoclip(state)
     local char = LP.Character
     if char then
-        -- NoClip для персонажа
-        if Farm.Cfg.NoClip then
-            for _, part in ipairs(char:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.CanCollide = false
-                end
+        for _, part in ipairs(char:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = not state
             end
         end
-        -- Анти-зависание при контакте с целью
-        if Farm.St.Target and Farm.St.Target.Parent then
-            local targetChar = Farm.St.Target.Parent
-            for _, p in ipairs(targetChar:GetDescendants()) do
-                if p:IsA("BasePart") then
-                    p.CanCollide = false
-                end
-            end
+    end
+end
+
+-- Обновляем коллизии при спавне
+LP.CharacterAdded:Connect(function(char)
+    if Farm.Cfg.NoClip then
+        task.wait(1)
+        setNoclip(true)
+    end
+end)
+
+-- Периодическая проверка (раз в секунду вместо каждого кадра)
+task.spawn(function()
+    while task.wait(1) do
+        if Farm.Cfg.Enabled and Farm.Cfg.NoClip then
+            setNoclip(true)
         end
     end
 end)
