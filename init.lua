@@ -1,5 +1,5 @@
 -- LOADER (init.lua)
-local BASE_URL = "https://hodinkola55-eng.github.io/wizard-west-autofarm/"
+local BASE_URL = "https://raw.githubusercontent.com/hodinkola55-eng/wizard-west-autofarm/main/"
 
 local function safeLoad(name)
     local success, result = pcall(function()
