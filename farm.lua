@@ -68,6 +68,30 @@ function Farm.pressKey(k)
     end
 end
 
+-- ИСПРАВЛЕННЫЙ NOCLIP
+RunSvc.Stepped:Connect(function()
+    if not Farm.Cfg.Enabled or not Farm.Cfg.NoClip then return end
+    local char = LP.Character
+    if char then
+        for _, part in ipairs(char:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = false
+            end
+        end
+    end
+end)
+
+RunSvc.Heartbeat:Connect(function()
+    if not Farm.Cfg.NoFall then return end
+    local c = LP.Character; if not c then return end
+    local h = c:FindFirstChild("Humanoid")
+    if h then h.StateChanged:Connect(function(_, new)
+        if new == Enum.HumanoidStateType.Freefall then
+            h:ChangeState(Enum.HumanoidStateType.Running)
+        end
+    end) end
+end)
+
 function Farm.flyTo(pos, spd)
     local _,root = Farm.getChar(); if not root then return false end
     Farm.stopFly()
